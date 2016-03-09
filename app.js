@@ -10,7 +10,6 @@ var routes = require('./routes/index');
 var app = express();
 
 
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -25,8 +24,44 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 
+app.onSocketConnect = function(socket) {
+  console.log("A user connected");
+  var io = app.get('io');
 
+  // Add an event handler that will get called when we
+  // receive a disconnect message
+  socket.on('disconnect', function(){
+    console.log("A user disconnected");
+  });
 
+  // Add an event that will get called when we receive
+  // a 'char message' event
+  socket.on('chat message', function(msg){
+    // emit a 'chat message' event with the msg to all connected clients
+    io.emit('chat message', msg);
+  });
+}
+
+/*
+// Here is all my websocket functionality
+io.on('connect', function(socket){
+  console.log("A user connected");
+
+  // Add an event handler that will get called when we
+  // receive a disconnect message
+  socket.on('disconnect', function(){
+    console.log("A user disconnected");
+  });
+
+  // Add an event that will get called when we receive
+  // a 'char message' event
+  socket.on('chat message', function(msg){
+    // emit a 'chat message' event with the msg to all connected clients
+    io.emit('chat message', msg);
+  });
+
+});
+*/
 
 
 // catch 404 and forward to error handler
